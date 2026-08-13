@@ -1,0 +1,9 @@
+[
+  {
+    "name": "ADD_APPROVED_SOURCE",
+    "institution_type": "Singapore government / hospital / health institute",
+    "url": "https://example.gov.sg/",
+    "topics": ["replace with approved pregnancy topic"],
+    "status": "placeholder - replace before production"
+  }
+]
