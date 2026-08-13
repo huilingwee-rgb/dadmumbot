@@ -1,57 +1,36 @@
-# DadMumBot - Streamlit Community Cloud package
+# DadMumBot - Streamlit Community Cloud
 
-## Stack
-- Python
-- Streamlit
-- OpenAI `gpt-4o-mini`
-- Singapore-only RAG (to be connected before real medical-information use)
+This version fixes the retrieval issue in the earlier prototype package. The app now:
 
-## Security changes in this version
-- Password gate before application functions
-- Login attempt throttling
-- Global application error boundary with generic user-facing messages
-- Server-side OpenAI API key and password hash via Streamlit Secrets
-- Prompt-injection detection, input limits and request rate limiting
+- fetches an allowlisted set of Singapore Government, public hospital and private healthcare pregnancy sources;
+- chunks and retrieves source material using OpenAI embeddings with a lexical fallback;
+- passes only the most relevant approved excerpts to `gpt-4o-mini`;
+- keeps `temperature=0.2` and a 550-token output cap;
+- keeps the OpenAI key and authentication secrets in Streamlit Secrets;
+- shows retrieval status in the UI for easier diagnosis.
 
-## OpenAI settings
-- Model: `gpt-4o-mini`
-- Temperature: `0.2`
-- Maximum output tokens: `550`
+## Streamlit Community Cloud
+1. Upload these files to GitHub.
+2. Deploy `app.py` from Streamlit Community Cloud.
+3. Add your existing authentication secrets and OpenAI key under App settings -> Secrets.
+4. Do not commit the real API key or password.
 
-## Temporary credentials
-The login credential is supplied separately with the deployment instructions. The plaintext password is intentionally not stored in this repository or ZIP package.
-
-## Streamlit Community Cloud deployment
-Streamlit Community Cloud deploys from GitHub and supports secrets through the app's Advanced settings. Official workflow: connect GitHub, create an app, select repository/branch/`app.py`, open Advanced settings, paste the Secrets block, then deploy.
-
-### Secrets to paste into Community Cloud
+## Required secrets
 ```toml
-APP_USERNAME = "<your username>"
-APP_PASSWORD_SALT = "<salt hex>"
-APP_PASSWORD_HASH = "<PBKDF2 hash hex>"
+APP_USERNAME = "dadmumbot"
+APP_PASSWORD_SALT = "<your-salt>"
+APP_PASSWORD_HASH = "<your-pbkdf2-hash>"
 APP_PASSWORD_ITERATIONS = 310000
-OPENAI_API_KEY = "<YOUR_REAL_OPENAI_API_KEY>"
+OPENAI_API_KEY = "<your-real-key>"
 OPENAI_MODEL = "gpt-4o-mini"
 OPENAI_MAX_OUTPUT_TOKENS = 550
 OPENAI_TEMPERATURE = 0.2
 ```
 
-Do not commit real secrets. Streamlit explicitly recommends keeping secrets outside the Git repository.
+## Important
+The medical-information knowledge base is restricted to the URLs in `data/approved_sources.json`. If a source page cannot be fetched, the app records a warning and does not invent content.
 
-## Deployment steps
-1. Create or use a GitHub repository.
-2. Upload the package files.
-3. Go to https://share.streamlit.io/ and sign in with GitHub.
-4. Click **Create app**.
-5. Choose repository, branch and `app.py`.
-6. Open **Advanced settings** and paste the Secrets block above.
-7. Select a supported Python version (Community Cloud currently defaults to Python 3.12).
-8. Deploy.
-9. Open the generated `*.streamlit.app` URL.
-10. Verify the login screen appears before any application functions.
-11. Verify invalid credentials are rejected.
-12. Verify the supplied credentials open the application.
-13. Verify no API key or password appears in page source, URL or error messages.
 
-## RAG gate
-`data/approved_sources.json` is a placeholder. Populate the knowledge base only with Singapore Government, Singapore public/private hospital and Singapore health-institute sources relevant to pregnancy/fertility before using medical-answer functionality.
+## Prenatal schedule
+
+The app includes a user-triggered prenatal check schedule based only on curated approved Singapore healthcare sources. For IVF, the EDD must be later than the FET date.
